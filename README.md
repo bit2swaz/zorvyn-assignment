@@ -80,6 +80,65 @@ When this API is deployed, Swagger can be shared publicly without any extra serv
 
 This keeps the solution simple: the docs are served directly by the same app instead of introducing a separate documentation service.
 
+## Public API Deployment
+
+The repository now includes [render.yaml](render.yaml) for a straightforward Render deployment.
+
+### What is my deployed API right now?
+
+Right now, you do **not** have a deployed API yet.
+
+- you have a GitHub Pages Swagger site workflow
+- you do **not** yet have a live backend URL for the Express app
+- that means `PUBLIC_API_BASE_URL` should only be set **after** the backend is deployed
+
+Once the API is live, your deployed API base URL will look something like:
+
+- `https://zorvyn-assignment-api.onrender.com`
+
+or your own custom domain.
+
+### Deploy to Render
+
+1. Push the latest code to GitHub.
+2. Go to Render and choose **New +** → **Blueprint**.
+3. Select this GitHub repository.
+4. Render will detect [render.yaml](render.yaml).
+5. Provide these environment variables in Render:
+
+	- `DATABASE_URL`
+	- `JWT_SECRET`
+	- `PUBLIC_API_BASE_URL` (optional at first; you can set it to the final Render URL after the first deploy)
+
+6. Deploy the service.
+
+After deployment, Render will give you a public backend URL such as:
+
+- `https://zorvyn-assignment-api.onrender.com`
+
+You can then verify:
+
+- `https://zorvyn-assignment-api.onrender.com/api/v1/health`
+- `https://zorvyn-assignment-api.onrender.com/api/v1/api-docs`
+- `https://zorvyn-assignment-api.onrender.com/api/v1/openapi.json`
+
+### Connect GitHub Pages Swagger to the live API
+
+After you have a real deployed API URL:
+
+1. Open GitHub → your repository → **Settings**.
+2. Go to **Secrets and variables** → **Actions**.
+3. Open the **Variables** tab.
+4. Click **New repository variable**.
+5. Create:
+
+	- Name: `PUBLIC_API_BASE_URL`
+	- Value: your deployed backend URL, for example `https://zorvyn-assignment-api.onrender.com`
+
+6. Re-run the **Deploy Swagger Docs** workflow, or push to `main`.
+
+That variable is used when building the GitHub Pages Swagger site so the published docs point at your real backend instead of localhost.
+
 ## Seeded Users
 
 The seed script creates these users with password `Password123!`:

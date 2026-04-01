@@ -2,14 +2,14 @@
   "name": "zorvyn-assignment",
   "version": "1.0.0",
   "description": "Finance backend scaffold for the Zorvyn intern assignment.",
-  "main": "dist/server.js",
+  "main": "dist/src/server.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "ts-node src/server.ts",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "seed": "ts-node prisma/seed.ts",
     "test": "jest --passWithNoTests",
     "lint": "eslint . --ext .ts",

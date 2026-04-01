@@ -4,6 +4,7 @@ import helmet from 'helmet';
 
 import { errorHandler } from './middlewares/errorHandler';
 import { authRoutes } from './routes/auth.routes';
+import { dashboardRoutes } from './routes/dashboard.routes';
 import { recordsRoutes } from './routes/records.routes';
 import { usersRoutes } from './routes/users.routes';
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/records', recordsRoutes);
 app.use('/api/v1/users', usersRoutes);
 

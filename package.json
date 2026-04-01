@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "ts-node src/server.ts",
+    "docs:build": "ts-node scripts/build-swagger-site.ts",
     "start": "node dist/src/server.js",
     "seed": "ts-node prisma/seed.ts",
     "test": "jest --passWithNoTests",

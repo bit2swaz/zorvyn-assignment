@@ -119,8 +119,11 @@ It also creates 54 realistic financial records spanning January to March 2026.
 
 - [postman_collection.json](postman_collection.json) — ready-to-import Postman collection for local testing
 - Shared Postman collection — https://postman.co/workspace/My-Workspace~dc9e0167-322a-4c56-899c-2b61e23c267e/collection/45848063-d2f9565a-3d70-4f56-a6bd-0b3e9b7c1d46?action=share&creator=45848063
+- GitHub Pages API docs — `https://bit2swaz.github.io/zorvyn-assignment/` (after the Pages workflow runs)
 - Swagger UI — available locally at `http://localhost:3000/api/v1/api-docs`
 - Raw OpenAPI JSON — available locally at `http://localhost:3000/api/v1/openapi.json`
+
+The GitHub Pages site is a static documentation view of the OpenAPI spec. Interactive requests still assume a local backend because this submission does not include a live hosted API.
 
 ## Example Requests & Responses
 

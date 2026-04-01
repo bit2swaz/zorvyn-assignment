@@ -1,8 +1,12 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 
-import { env } from './env';
+const publicApiBaseUrl = process.env.PUBLIC_API_BASE_URL?.trim();
 
-const resolvedServerUrl = (env.PUBLIC_API_BASE_URL ?? `http://localhost:${env.PORT}`).replace(/\/$/, '');
+const resolvedServerUrl = (
+  publicApiBaseUrl && publicApiBaseUrl.length > 0
+    ? publicApiBaseUrl
+    : `http://localhost:${process.env.PORT ?? '3000'}`
+).replace(/\/$/, '');
 
 const swaggerSpec = swaggerJsdoc({
   failOnErrors: true,
@@ -16,7 +20,9 @@ const swaggerSpec = swaggerJsdoc({
     servers: [
       {
         url: resolvedServerUrl,
-        description: env.PUBLIC_API_BASE_URL ? 'Configured public API server' : 'Local development server',
+        description: publicApiBaseUrl
+          ? 'Configured public API server'
+          : 'Local development server',
       },
     ],
     components: {

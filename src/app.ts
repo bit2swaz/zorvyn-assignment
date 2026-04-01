@@ -14,6 +14,18 @@ import { sendSuccess } from './utils/response';
 
 const app = express();
 
+const swaggerDocsRedirectHtml = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="0; url=/api/v1/api-docs/" />
+    <title>Redirecting to API Docs</title>
+  </head>
+  <body>
+    <p>Redirecting to <a href="/api/v1/api-docs/">/api/v1/api-docs/</a>...</p>
+  </body>
+</html>`;
+
 app.use(globalRateLimiter);
 app.use(helmet());
 app.use(cors());
@@ -23,6 +35,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/v1/auth', authRateLimiter, authRoutes);
 app.get('/api/v1/openapi.json', (_request, response) => {
   response.status(200).json(swaggerSpec);
+});
+app.get(/^\/api\/v1\/api-docs$/, (_request, response) => {
+  response.status(200).type('html').send(swaggerDocsRedirectHtml);
 });
 app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/v1/dashboard', dashboardRoutes);

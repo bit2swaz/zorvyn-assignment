@@ -26,6 +26,21 @@ describe('application surface', () => {
     expect(response.text).toContain('Swagger UI');
   });
 
+  it('serves the raw OpenAPI spec for public Swagger tooling', async () => {
+    const response = await request(app).get('/api/v1/openapi.json');
+
+    expect(response.status).toBe(200);
+    expect(response.headers['content-type']).toContain('application/json');
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        openapi: '3.0.0',
+        info: expect.objectContaining({
+          title: 'Zorvyn Finance Backend API',
+        }),
+      }),
+    );
+  });
+
   it('enforces the auth-specific rate limit after 10 requests in 15 minutes', async () => {
     let finalResponse;
 

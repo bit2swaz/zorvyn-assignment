@@ -21,6 +21,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/v1/auth', authRateLimiter, authRoutes);
+app.get('/api/v1/openapi.json', (_request, response) => {
+  response.status(200).json(swaggerSpec);
+});
 app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/records', recordsRoutes);

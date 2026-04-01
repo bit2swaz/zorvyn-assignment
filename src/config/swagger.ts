@@ -1,15 +1,6 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 
-const publicApiBaseUrl = process.env.PUBLIC_API_BASE_URL?.trim();
-const renderExternalUrl = process.env.RENDER_EXTERNAL_URL?.trim();
-
-const resolvedServerUrl = (
-  publicApiBaseUrl && publicApiBaseUrl.length > 0
-    ? publicApiBaseUrl
-    : renderExternalUrl && renderExternalUrl.length > 0
-      ? renderExternalUrl
-    : `http://localhost:${process.env.PORT ?? '3000'}`
-).replace(/\/$/, '');
+const resolvedServerUrl = `http://localhost:${process.env.PORT ?? '3000'}`;
 
 const swaggerSpec = swaggerJsdoc({
   failOnErrors: true,
@@ -23,11 +14,7 @@ const swaggerSpec = swaggerJsdoc({
     servers: [
       {
         url: resolvedServerUrl,
-        description: publicApiBaseUrl
-          ? 'Configured public API server'
-          : renderExternalUrl
-            ? 'Render deployment server'
-          : 'Local development server',
+        description: 'Local development server',
       },
     ],
     components: {

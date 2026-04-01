@@ -2,7 +2,7 @@
 
 Production-style finance backend built with Node.js, TypeScript, Express, Prisma, PostgreSQL, Zod, JWT authentication, RBAC, rate limiting, Swagger docs, and integration tests.
 
-The implementation intentionally stays as a modular monolith: it avoids unnecessary complexity for the assignment scope, while still adding thoughtful extras like JWT auth, search, pagination, soft delete, rate limiting, seeded data, Swagger, and integration tests.
+The implementation intentionally stays as a modular monolith: it avoids unnecessary complexity for the assignment scope, while still adding thoughtful extras like JWT auth, search, pagination, soft delete, rate limiting, seeded data, Swagger, integration tests, and a Postman collection for reviewer walkthroughs.
 
 ## Overview
 
@@ -36,10 +36,6 @@ This project implements the Zorvyn intern assignment as a modular monolith with 
 
 3. Update `.env` with a valid PostgreSQL connection string and a secure JWT secret.
 
-	If you plan to host the API publicly, also set:
-
-	`PUBLIC_API_BASE_URL=https://your-api-host.example.com`
-
 4. Sync the schema:
 
 	`npx prisma generate`
@@ -69,16 +65,14 @@ This project implements the Zorvyn intern assignment as a modular monolith with 
 - `npm test` — run the full Jest suite
 - `npm run seed` — seed the database with demo users and records
 
-## Public Swagger Deployment
+## Reviewer Walkthrough
 
-When this API is deployed, Swagger can be shared publicly without any extra service:
+This repository is intentionally prepared for local review instead of requiring a paid live deployment.
 
-- host the API on any public platform such as Render, Railway, Fly.io, or a VPS
-- set `PUBLIC_API_BASE_URL` to the deployed API base URL
-- share the hosted docs URL: `https://your-api-host.example.com/api/v1/api-docs`
-- share the raw spec URL for external tooling: `https://your-api-host.example.com/api/v1/openapi.json`
-
-This keeps the solution simple: the docs are served directly by the same app instead of introducing a separate documentation service.
+- run the API locally with seeded data
+- explore the endpoints in Swagger at `/api/v1/api-docs`
+- import [postman_collection.json](postman_collection.json) into Postman for a guided request flow
+- use the seeded users documented below for quick role-based testing
 
 ## Seeded Users
 
@@ -120,6 +114,12 @@ It also creates 54 realistic financial records spanning January to March 2026.
 
 - `GET /api/v1/api-docs`
 - `GET /api/v1/openapi.json`
+
+## Review Assets
+
+- [postman_collection.json](postman_collection.json) — ready-to-import Postman collection for local testing
+- Swagger UI — available locally at `http://localhost:3000/api/v1/api-docs`
+- Raw OpenAPI JSON — available locally at `http://localhost:3000/api/v1/openapi.json`
 
 ## Example Requests & Responses
 
@@ -279,10 +279,16 @@ This keeps the heavy math in the database where it scales better.
 ## Documentation & Security Notes
 
 - Swagger docs are generated from controller JSDoc annotations.
-- Raw OpenAPI JSON is available at `GET /api/v1/openapi.json` for external Swagger tooling.
+- Raw OpenAPI JSON is available at `GET /api/v1/openapi.json` for local tooling imports.
 - Global rate limiting is set to `100 requests / 15 minutes`.
 - Auth endpoints are additionally rate-limited to `10 requests / 15 minutes`.
 - Protected routes use bearer-token authentication.
+
+## Submission Notes
+
+- No live backend deployment is included.
+- This is intentional to keep the assignment focused on backend design and avoid unnecessary operational complexity or paid hosting requirements.
+- The recommended reviewer flow is: `npm install` → `npx prisma migrate dev` → `npm run seed` → `npm run dev` → review via Swagger or Postman.
 
 ## Final Verification Checklist
 

@@ -17,7 +17,6 @@ const envSchema = z
       .min(1, 'PORT must be greater than 0')
       .max(65535, 'PORT must be less than or equal to 65535'),
     JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
-    PUBLIC_API_BASE_URL: z.url('PUBLIC_API_BASE_URL must be a valid URL').optional(),
   })
   .passthrough();
 

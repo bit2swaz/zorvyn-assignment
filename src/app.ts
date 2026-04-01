@@ -2,6 +2,8 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 
+import { errorHandler } from './middlewares/errorHandler';
+
 const app = express();
 
 app.use(helmet());
@@ -14,5 +16,7 @@ app.get('/api/v1/health', (_request, response) => {
     message: 'Finance backend is running.',
   });
 });
+
+app.use(errorHandler);
 
 export { app };

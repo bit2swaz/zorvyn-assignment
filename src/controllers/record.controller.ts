@@ -7,6 +7,179 @@ import { recordService } from '../services/record.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess, type ErrorDetail } from '../utils/response';
 
+/**
+ * @openapi
+ * /api/v1/records:
+ *   post:
+ *     tags:
+ *       - Records
+ *     summary: Create a financial record
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [amount, type, category, date]
+ *             properties:
+ *               amount:
+ *                 type: number
+ *               type:
+ *                 type: string
+ *                 enum: [INCOME, EXPENSE]
+ *               category:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *                 format: date-time
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Record created successfully.
+ *       400:
+ *         description: Invalid input.
+ *       401:
+ *         description: Unauthenticated or inactive user.
+ *       403:
+ *         description: Forbidden.
+ *   get:
+ *     tags:
+ *       - Records
+ *     summary: List records with filters
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [INCOME, EXPENSE]
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Records returned successfully.
+ *       400:
+ *         description: Invalid input.
+ *       401:
+ *         description: Unauthenticated or inactive user.
+ *       403:
+ *         description: Forbidden.
+ * /api/v1/records/{id}:
+ *   get:
+ *     tags:
+ *       - Records
+ *     summary: Get a single record
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Record returned successfully.
+ *       401:
+ *         description: Unauthenticated or inactive user.
+ *       403:
+ *         description: Forbidden.
+ *       404:
+ *         description: Record not found.
+ *   put:
+ *     tags:
+ *       - Records
+ *     summary: Fully update a record
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [amount, type, category, date]
+ *             properties:
+ *               amount:
+ *                 type: number
+ *               type:
+ *                 type: string
+ *                 enum: [INCOME, EXPENSE]
+ *               category:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *                 format: date-time
+ *               notes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Record updated successfully.
+ *       400:
+ *         description: Invalid input.
+ *       401:
+ *         description: Unauthenticated or inactive user.
+ *       403:
+ *         description: Forbidden.
+ *       404:
+ *         description: Record not found.
+ *   delete:
+ *     tags:
+ *       - Records
+ *     summary: Soft delete a record
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Record soft deleted successfully.
+ *       401:
+ *         description: Unauthenticated or inactive user.
+ *       403:
+ *         description: Forbidden.
+ *       404:
+ *         description: Record not found.
+ */
+
 interface AppError extends Error {
   statusCode?: number;
   details?: ErrorDetail[];

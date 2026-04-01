@@ -4,4 +4,5 @@ module.exports = {
   roots: ['<rootDir>/tests'],
   moduleFileExtensions: ['ts', 'js', 'json'],
   clearMocks: true,
+  maxWorkers: 1,
 };

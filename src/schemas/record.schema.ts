@@ -19,6 +19,8 @@ export const createRecordSchema = z.strictObject({
   notes: z.string().trim().min(1, 'Notes must not be empty').optional(),
 });
 
+export const updateRecordSchema = createRecordSchema;
+
 export const listRecordsQuerySchema = z.object({
   page: z.coerce.number().int().min(1, 'Page must be at least 1').optional().default(1),
   limit: z.coerce.number().int().min(1, 'Limit must be at least 1').max(100, 'Limit must be at most 100').optional().default(10),
@@ -30,4 +32,5 @@ export const listRecordsQuerySchema = z.object({
 });
 
 export type CreateRecordInput = z.infer<typeof createRecordSchema>;
+export type UpdateRecordInput = z.infer<typeof updateRecordSchema>;
 export type ListRecordsQuery = z.infer<typeof listRecordsQuerySchema>;

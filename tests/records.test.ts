@@ -376,4 +376,100 @@ describe('financial records', () => {
       error: [],
     });
   });
+
+  it('allows an ADMIN to fully update a record', async () => {
+    const admin = await createUser({
+      email: 'records.admin.update@example.com',
+      role: Role.ADMIN,
+    });
+    const record = await createRecord({
+      userId: admin.id,
+      amount: '150.00',
+      type: TransactionType.EXPENSE,
+      category: 'office',
+      date: new Date('2026-03-01T00:00:00.000Z'),
+      notes: 'Initial office purchase',
+    });
+
+    const response = await request(app)
+      .put(`/api/v1/records/${record.id}`)
+      .set(authHeader(admin.id))
+      .send({
+        amount: 999.99,
+        type: 'INCOME',
+        category: 'refund',
+        date: '2026-03-05T00:00:00.000Z',
+        notes: 'Vendor refund received',
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      success: true,
+      message: 'Operation successful',
+      data: expect.objectContaining({
+        id: record.id,
+        amount: '999.99',
+        type: 'INCOME',
+        category: 'refund',
+        notes: 'Vendor refund received',
+      }),
+    });
+
+    const updatedRecord = await prisma.financialRecord.findUnique({
+      where: { id: record.id },
+    });
+
+    expect(updatedRecord).not.toBeNull();
+    expect(updatedRecord?.amount.toString()).toBe('999.99');
+    expect(updatedRecord?.type).toBe(TransactionType.INCOME);
+    expect(updatedRecord?.category).toBe('refund');
+    expect(updatedRecord?.notes).toBe('Vendor refund received');
+  });
+
+  it('soft deletes a record without removing the row and hides it from subsequent reads', async () => {
+    const admin = await createUser({
+      email: 'records.admin.soft-delete@example.com',
+      role: Role.ADMIN,
+    });
+    const record = await createRecord({
+      userId: admin.id,
+      amount: '250.00',
+      type: TransactionType.EXPENSE,
+      category: 'equipment',
+      date: new Date('2026-03-08T00:00:00.000Z'),
+      notes: 'Keyboard purchase',
+    });
+
+    const deleteResponse = await request(app)
+      .delete(`/api/v1/records/${record.id}`)
+      .set(authHeader(admin.id));
+
+    expect(deleteResponse.status).toBe(200);
+    expect(deleteResponse.body).toEqual({
+      success: true,
+      message: 'Operation successful',
+      data: expect.objectContaining({
+        id: record.id,
+        deletedAt: expect.any(String),
+      }),
+    });
+
+    const rowStillExists = await prisma.financialRecord.findUnique({
+      where: { id: record.id },
+    });
+
+    expect(rowStillExists).not.toBeNull();
+    expect(rowStillExists?.deletedAt).not.toBeNull();
+
+    const detailResponse = await request(app)
+      .get(`/api/v1/records/${record.id}`)
+      .set(authHeader(admin.id));
+
+    expect(detailResponse.status).toBe(404);
+    expect(detailResponse.body).toEqual({
+      success: false,
+      message: 'Resource not found or invalid input',
+      error: [],
+    });
+  });
 });

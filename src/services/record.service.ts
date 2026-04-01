@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 
 import { prisma } from '../config/prisma';
-import type { CreateRecordInput, ListRecordsQuery } from '../schemas/record.schema';
+import type { CreateRecordInput, ListRecordsQuery, UpdateRecordInput } from '../schemas/record.schema';
 import { serializeRecord } from '../utils/record';
 
 interface AppError extends Error {
@@ -101,5 +101,51 @@ export const recordService = {
     }
 
     return serializeRecord(record);
+  },
+
+  async updateRecord(recordId: string, input: UpdateRecordInput) {
+    const existingRecord = await prisma.financialRecord.findFirst({
+      where: {
+        id: recordId,
+        deletedAt: null,
+      },
+    });
+
+    if (!existingRecord) {
+      throw createAppError(404, 'Resource not found or invalid input');
+    }
+
+    const updatedRecord = await prisma.financialRecord.update({
+      where: { id: recordId },
+      data: {
+        amount: new Prisma.Decimal(input.amount),
+        type: input.type,
+        category: input.category,
+        date: input.date,
+        notes: input.notes ?? null,
+      },
+    });
+
+    return serializeRecord(updatedRecord);
+  },
+
+  async softDeleteRecord(recordId: string) {
+    const existingRecord = await prisma.financialRecord.findFirst({
+      where: {
+        id: recordId,
+        deletedAt: null,
+      },
+    });
+
+    if (!existingRecord) {
+      throw createAppError(404, 'Resource not found or invalid input');
+    }
+
+    const deletedRecord = await prisma.financialRecord.update({
+      where: { id: recordId },
+      data: { deletedAt: new Date() },
+    });
+
+    return serializeRecord(deletedRecord);
   },
 };

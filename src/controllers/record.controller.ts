@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
 
 import type { AuthenticatedRequest } from '../types/auth';
-import type { CreateRecordInput, ListRecordsQuery } from '../schemas/record.schema';
-import { createRecordSchema, listRecordsQuerySchema } from '../schemas/record.schema';
+import type { CreateRecordInput, ListRecordsQuery, UpdateRecordInput } from '../schemas/record.schema';
+import { createRecordSchema, listRecordsQuerySchema, updateRecordSchema } from '../schemas/record.schema';
 import { recordService } from '../services/record.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess, type ErrorDetail } from '../utils/response';
@@ -95,6 +95,33 @@ export const getRecords = asyncHandler(async (request: Request, response: Respon
 
 export const getRecordById = asyncHandler(async (request: Request, response: Response) => {
   const record = await recordService.getRecordById(getRecordIdParam(request));
+
+  sendSuccess(response, {
+    message: 'Operation successful',
+    data: record,
+  });
+});
+
+export const updateRecord = asyncHandler(async (request: Request, response: Response) => {
+  const parsedBody = updateRecordSchema.safeParse(request.body);
+
+  if (!parsedBody.success) {
+    throw createValidationError(mapIssuesToErrorDetails(parsedBody.error.issues));
+  }
+
+  const record = await recordService.updateRecord(
+    getRecordIdParam(request),
+    parsedBody.data as UpdateRecordInput,
+  );
+
+  sendSuccess(response, {
+    message: 'Operation successful',
+    data: record,
+  });
+});
+
+export const deleteRecord = asyncHandler(async (request: Request, response: Response) => {
+  const record = await recordService.softDeleteRecord(getRecordIdParam(request));
 
   sendSuccess(response, {
     message: 'Operation successful',

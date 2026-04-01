@@ -10,6 +10,7 @@ import { authRoutes } from './routes/auth.routes';
 import { dashboardRoutes } from './routes/dashboard.routes';
 import { recordsRoutes } from './routes/records.routes';
 import { usersRoutes } from './routes/users.routes';
+import { sendSuccess } from './utils/response';
 
 const app = express();
 
@@ -26,8 +27,11 @@ app.use('/api/v1/records', recordsRoutes);
 app.use('/api/v1/users', usersRoutes);
 
 app.get('/api/v1/health', (_request, response) => {
-  response.status(200).json({
+  sendSuccess(response, {
     message: 'Finance backend is running.',
+    data: {
+      status: 'ok',
+    },
   });
 });
 

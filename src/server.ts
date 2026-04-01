@@ -1,6 +1,7 @@
 import { app } from './app';
+import { env } from './config/env';
 
-const port = Number(process.env.PORT) || 3000;
+const port = env.PORT;
 
 app.listen(port, () => {
   process.stdout.write(`Server listening on port ${port}\n`);

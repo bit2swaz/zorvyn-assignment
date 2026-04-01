@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User & Role Management (Core Req #1)
+enum Role {
+  VIEWER
+  ANALYST
+  ADMIN
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(VIEWER)
+  status       Status   @default(ACTIVE)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  records      FinancialRecord[]
+}
+
+// Financial Records Management (Core Req #2)
+model FinancialRecord {
+  id          String          @id @default(uuid())
+  amount      Decimal         // Exact numerical precision for finance
+  type        TransactionType // income or expense
+  category    String          // e.g., 'salary', 'groceries', 'servers'
+  date        DateTime
+  notes       String?         // Optional description
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  deletedAt   DateTime?       // Required for Optional "Soft Delete"
+
+  userId      String
+  createdBy   User            @relation(fields: [userId], references: [id])
+}

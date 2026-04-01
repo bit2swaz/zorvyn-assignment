@@ -1,15 +1,23 @@
+databases:
+  - name: zorvyn-assignment-db
+    databaseName: zorvyn_assignment
+    user: zorvyn_assignment_user
+
 services:
   - type: web
     name: zorvyn-assignment-api
     runtime: node
     plan: free
     buildCommand: npm ci --include=dev && npx prisma generate && npm run build
-    startCommand: NODE_ENV=production npx prisma migrate deploy && npm start
+    preDeployCommand: npx prisma migrate deploy
+    startCommand: NODE_ENV=production npm start
     healthCheckPath: /api/v1/health
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: zorvyn-assignment-db
+          property: connectionString
       - key: JWT_SECRET
         sync: false
       - key: PUBLIC_API_BASE_URL

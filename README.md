@@ -2,6 +2,8 @@
 
 Production-style finance backend built with Node.js, TypeScript, Express, Prisma, PostgreSQL, Zod, JWT authentication, RBAC, rate limiting, Swagger docs, and integration tests.
 
+The implementation intentionally stays as a modular monolith: it avoids unnecessary complexity for the assignment scope, while still adding thoughtful extras like JWT auth, search, pagination, soft delete, rate limiting, seeded data, Swagger, and integration tests.
+
 ## Overview
 
 This project implements the Zorvyn intern assignment as a modular monolith with strict separation of concerns:
@@ -34,11 +36,15 @@ This project implements the Zorvyn intern assignment as a modular monolith with 
 
 3. Update `.env` with a valid PostgreSQL connection string and a secure JWT secret.
 
+	If you plan to host the API publicly, also set:
+
+	`PUBLIC_API_BASE_URL=https://your-api-host.example.com`
+
 4. Sync the schema:
 
 	`npx prisma generate`
 
-	`npx prisma db push`
+	`npx prisma migrate dev --name init`
 
 5. Seed sample data:
 
@@ -52,12 +58,27 @@ This project implements the Zorvyn intern assignment as a modular monolith with 
 
 	`http://localhost:3000/api/v1/api-docs`
 
+8. Raw OpenAPI spec:
+
+	`http://localhost:3000/api/v1/openapi.json`
+
 ## Useful Scripts
 
 - `npm run dev` — start the development server
 - `npm run build` — compile TypeScript
 - `npm test` — run the full Jest suite
 - `npm run seed` — seed the database with demo users and records
+
+## Public Swagger Deployment
+
+When this API is deployed, Swagger can be shared publicly without any extra service:
+
+- host the API on any public platform such as Render, Railway, Fly.io, or a VPS
+- set `PUBLIC_API_BASE_URL` to the deployed API base URL
+- share the hosted docs URL: `https://your-api-host.example.com/api/v1/api-docs`
+- share the raw spec URL for external tooling: `https://your-api-host.example.com/api/v1/openapi.json`
+
+This keeps the solution simple: the docs are served directly by the same app instead of introducing a separate documentation service.
 
 ## Seeded Users
 
@@ -98,6 +119,118 @@ It also creates 54 realistic financial records spanning January to March 2026.
 ### Docs
 
 - `GET /api/v1/api-docs`
+- `GET /api/v1/openapi.json`
+
+## Example Requests & Responses
+
+### Register a viewer account
+
+Request:
+
+```http
+POST /api/v1/auth/register
+Content-Type: application/json
+
+{
+	"name": "Alice Viewer",
+	"email": "alice.viewer@example.com",
+	"password": "Password123!"
+}
+```
+
+Response:
+
+```json
+{
+	"success": true,
+	"message": "Operation successful",
+	"data": {
+		"id": "uuid",
+		"name": "Alice Viewer",
+		"email": "alice.viewer@example.com",
+		"role": "VIEWER",
+		"status": "ACTIVE",
+		"createdAt": "2026-04-01T00:00:00.000Z",
+		"updatedAt": "2026-04-01T00:00:00.000Z"
+	}
+}
+```
+
+### Create a financial record as admin
+
+Request:
+
+```http
+POST /api/v1/records
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+	"amount": 1250.75,
+	"type": "INCOME",
+	"category": "salary",
+	"date": "2026-02-01T00:00:00.000Z",
+	"notes": "Monthly salary"
+}
+```
+
+Response:
+
+```json
+{
+	"success": true,
+	"message": "Operation successful",
+	"data": {
+		"id": "uuid",
+		"amount": "1250.75",
+		"type": "INCOME",
+		"category": "salary",
+		"date": "2026-02-01T00:00:00.000Z",
+		"notes": "Monthly salary",
+		"createdAt": "2026-04-01T00:00:00.000Z",
+		"updatedAt": "2026-04-01T00:00:00.000Z",
+		"deletedAt": null,
+		"userId": "uuid"
+	}
+}
+```
+
+### List filtered records with pagination
+
+Request:
+
+```http
+GET /api/v1/records?page=1&limit=2&type=EXPENSE&q=travel
+Authorization: Bearer <jwt>
+```
+
+Response:
+
+```json
+{
+	"success": true,
+	"message": "Operation successful",
+	"data": [
+		{
+			"id": "uuid",
+			"amount": "150.00",
+			"type": "EXPENSE",
+			"category": "travel",
+			"date": "2026-02-16T00:00:00.000Z",
+			"notes": "Airport taxi",
+			"createdAt": "2026-04-01T00:00:00.000Z",
+			"updatedAt": "2026-04-01T00:00:00.000Z",
+			"deletedAt": null,
+			"userId": "uuid"
+		}
+	],
+	"meta": {
+		"page": 1,
+		"limit": 2,
+		"total": 1
+	}
+}
+```
 
 ## TDD Approach
 
@@ -129,6 +262,7 @@ I chose a modular monolith:
 - less coordination overhead for a scoped assignment
 - easier end-to-end testing with one API boundary
 - still preserves maintainability via route/controller/service separation
+- avoids unnecessary complexity while still demonstrating thoughtful backend design
 
 Microservices would add operational complexity without meaningful payoff for the assignment size.
 
@@ -145,6 +279,7 @@ This keeps the heavy math in the database where it scales better.
 ## Documentation & Security Notes
 
 - Swagger docs are generated from controller JSDoc annotations.
+- Raw OpenAPI JSON is available at `GET /api/v1/openapi.json` for external Swagger tooling.
 - Global rate limiting is set to `100 requests / 15 minutes`.
 - Auth endpoints are additionally rate-limited to `10 requests / 15 minutes`.
 - Protected routes use bearer-token authentication.
@@ -154,4 +289,5 @@ This keeps the heavy math in the database where it scales better.
 - `npm run seed`
 - `npm test`
 - `npm run build`
+- `npx prisma migrate status`
 - open `http://localhost:3000/api/v1/api-docs`

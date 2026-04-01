@@ -18,7 +18,7 @@ const envSchema = z
       .max(65535, 'PORT must be less than or equal to 65535'),
     JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
   })
-  .strict();
+  .passthrough();
 
 const parsedEnv = envSchema.safeParse(process.env);
 
